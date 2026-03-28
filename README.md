@@ -1,5 +1,7 @@
 # macos-ddns6
 
+English | [日本語](README.ja.md)
+
 Dynamic DNS updater for macOS — automatically detects your IPv6 SLAAC address and updates DNS records.
 
 ## Features
