@@ -19,7 +19,7 @@ macOS assigns three types of IPv6 addresses via SLAAC:
 | Type | Flag | Stability | Used by macos-ddns6 |
 |------|------|-----------|:---:|
 | Link-local | `secured` | Stable | No (not routable) |
-| Global stable | `autoconf secured` | Stable across reboots | **Yes** |
+| Global stable | `autoconf secured` | Stable while network environment unchanged | **Yes** |
 | Global temporary | `autoconf temporary` | Rotates periodically | No |
 
 The `autoconf secured` address (RFC 7217) is deterministically generated from the network prefix and a per-host secret. It remains stable as long as you stay on the same network, making it ideal for DNS registration.
