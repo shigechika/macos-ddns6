@@ -1,0 +1,29 @@
+# ddns6.conf — macos-ddns6 configuration
+#
+# Copy this file to one of the following locations:
+#   ~/.config/macos-ddns6/ddns6.conf  (user)
+#   /etc/macos-ddns6/ddns6.conf       (system)
+#
+# Or specify a custom path:
+#   ddns6-update.sh --config /path/to/ddns6.conf
+
+# DNS provider: gcloud (default)
+# Future: cloudflare, route53
+DNS_PROVIDER="gcloud"
+
+# Fully qualified domain name (must end with a dot for Cloud DNS)
+DNS_FQDN="myhost.example.com."
+
+# Record TTL in seconds
+DNS_TTL=300
+
+# --- Google Cloud DNS provider settings ---
+
+# Cloud DNS managed zone name
+DNS_ZONE="example-com"
+
+# Path to service account key JSON
+GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/sa-dns-updater.json"
+
+# Path to gcloud binary (auto-detected if not set)
+# GCLOUD="/opt/homebrew/bin/gcloud"
