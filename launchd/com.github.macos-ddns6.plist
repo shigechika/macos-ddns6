@@ -14,10 +14,12 @@
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
         <!-- Bypass gcloud virtenv activation error in launchd.
-             /usr/bin/python3 (macOS built-in) works but may show a deprecation
-             warning. Use /opt/homebrew/bin/python3 if available. -->
+             Requires Python 3.10+. Adjust path for your environment:
+             - Homebrew (Apple Silicon): /opt/homebrew/bin/python3
+             - Homebrew (Intel):         /usr/local/bin/python3
+             - macOS built-in:           /usr/bin/python3 (3.9, may not work) -->
         <key>CLOUDSDK_PYTHON</key>
-        <string>/usr/bin/python3</string>
+        <string>CLOUDSDK_PYTHON_PLACEHOLDER</string>
     </dict>
     <key>RunAtLoad</key>
     <true/>

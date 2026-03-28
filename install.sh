@@ -35,11 +35,28 @@ else
     echo "    Config already exists: $CONFIG_DIR/ddns6.conf"
 fi
 
-# launchd plist
+# Detect Python 3.10+ for CLOUDSDK_PYTHON
+CLOUDSDK_PYTHON=""
+for candidate in /opt/homebrew/bin/python3 /usr/local/bin/python3 /usr/bin/python3; do
+    if [[ -x "$candidate" ]]; then
+        ver=$("$candidate" -c "import sys; print(sys.version_info.minor)" 2>/dev/null || echo "0")
+        if [[ "$ver" -ge 10 ]]; then
+            CLOUDSDK_PYTHON="$candidate"
+            break
+        fi
+    fi
+done
+if [[ -z "$CLOUDSDK_PYTHON" ]]; then
+    echo "    WARNING: Python 3.10+ not found. gcloud may not work in launchd."
+    CLOUDSDK_PYTHON="/usr/bin/python3"
+fi
+echo "    CLOUDSDK_PYTHON: $CLOUDSDK_PYTHON"
+
+# launchd plist (replace placeholder with detected Python path)
 if launchctl list 2>/dev/null | grep -q com.github.macos-ddns6; then
     launchctl unload "$PLIST_DST" 2>/dev/null || true
 fi
-cp "$PLIST_SRC" "$PLIST_DST"
+sed "s|CLOUDSDK_PYTHON_PLACEHOLDER|$CLOUDSDK_PYTHON|" "$PLIST_SRC" > "$PLIST_DST"
 echo "    Installed launchd plist: $PLIST_DST"
 
 echo ""
