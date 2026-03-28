@@ -13,6 +13,9 @@
     <dict>
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <!-- Bypass gcloud virtenv activation error in launchd -->
+        <key>CLOUDSDK_PYTHON</key>
+        <string>/opt/homebrew/bin/python3</string>
     </dict>
     <key>RunAtLoad</key>
     <true/>
