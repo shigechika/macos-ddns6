@@ -42,6 +42,21 @@ Start the service:
 launchctl load ~/Library/LaunchAgents/com.github.macos-ddns6.plist
 ```
 
+### LaunchAgent vs LaunchDaemon
+
+| Mode | Runs when | Config location | Install command |
+|------|-----------|-----------------|-----------------|
+| **LaunchAgent** (default) | User is logged in | `~/.config/macos-ddns6/` | `./install.sh` |
+| **LaunchDaemon** | System boot (no login required) | `/etc/macos-ddns6/` | `./install.sh --daemon` |
+
+Use `--daemon` for headless servers or Mac minis that may reboot without user login:
+
+```bash
+sudo ./install.sh --daemon
+sudo vi /etc/macos-ddns6/ddns6.conf
+sudo launchctl load /Library/LaunchDaemons/com.github.macos-ddns6.plist
+```
+
 ## Configuration
 
 Copy `ddns6.conf.example` to `~/.config/macos-ddns6/ddns6.conf`:
@@ -109,13 +124,14 @@ tail -f /tmp/ddns6-update.log
 macos-ddns6/
 ├── ddns6-update.sh         # Main update script
 ├── ddns6.conf.example      # Configuration template
-├── install.sh              # Installer
+├── install.sh              # Installer (--daemon for LaunchDaemon)
 ├── lib/
 │   └── ipv6-addr.sh        # IPv6 address detection library
 ├── providers/
 │   └── gcloud.sh           # Google Cloud DNS provider
 ├── launchd/
-│   └── com.github.macos-ddns6.plist  # launchd template
+│   ├── com.github.macos-ddns6.plist         # LaunchAgent template
+│   └── com.github.macos-ddns6.daemon.plist  # LaunchDaemon template
 └── README.md
 ```
 
