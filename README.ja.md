@@ -106,7 +106,31 @@ gcloud iam service-accounts keys create ~/.config/gcloud/sa-dns-updater.json \
 chmod 600 ~/.config/gcloud/sa-dns-updater.json
 ```
 
-gcloud プロバイダは `GOOGLE_APPLICATION_CREDENTIALS` で指定されたキーファイルを使って `gcloud auth activate-service-account` を自動実行します。手動での activate は不要です。
+### 認証方式
+
+gcloud プロバイダは 2 つの認証方式に対応しています：
+
+**方式 A: キーファイル（デフォルト）** — `GOOGLE_APPLICATION_CREDENTIALS` を設定すると、実行のたびに `gcloud auth activate-service-account` を自動実行します。
+
+```bash
+# ddns6.conf に設定
+GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/sa-dns-updater.json"
+```
+
+**方式 B: gcloud configuration** — サービスアカウント専用の gcloud configuration を作成します。毎回の activate が不要になり、他のプロジェクトの認証情報と分離できます。
+
+```bash
+# 専用の configuration を作成
+gcloud config configurations create example-dns
+gcloud auth activate-service-account \
+  --key-file=~/.config/gcloud/sa-dns-updater.json
+gcloud config set project YOUR_PROJECT
+
+# 環境変数で configuration を切り替え
+export CLOUDSDK_ACTIVE_CONFIG_NAME=example-dns
+```
+
+方式 B を使う場合、設定ファイルの `GOOGLE_APPLICATION_CREDENTIALS` は空またはコメントアウトしてください。gcloud configuration が認証を担います。
 
 ## 手動実行
 

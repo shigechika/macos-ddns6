@@ -106,7 +106,31 @@ gcloud iam service-accounts keys create ~/.config/gcloud/sa-dns-updater.json \
 chmod 600 ~/.config/gcloud/sa-dns-updater.json
 ```
 
-The gcloud provider automatically runs `gcloud auth activate-service-account` using the key file specified in `GOOGLE_APPLICATION_CREDENTIALS`. No manual activation is needed.
+### Authentication Methods
+
+The gcloud provider supports two authentication methods:
+
+**Method A: Key file (default)** — Set `GOOGLE_APPLICATION_CREDENTIALS` in your config. The provider automatically runs `gcloud auth activate-service-account` on each invocation.
+
+```bash
+# In ddns6.conf
+GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/sa-dns-updater.json"
+```
+
+**Method B: gcloud configuration** — Create a dedicated gcloud configuration with the service account pre-activated. This avoids re-activation on every run and isolates credentials from your other gcloud projects.
+
+```bash
+# Create a dedicated configuration
+gcloud config configurations create example-dns
+gcloud auth activate-service-account \
+  --key-file=~/.config/gcloud/sa-dns-updater.json
+gcloud config set project YOUR_PROJECT
+
+# Set the configuration via environment variable
+export CLOUDSDK_ACTIVE_CONFIG_NAME=example-dns
+```
+
+When using Method B, leave `GOOGLE_APPLICATION_CREDENTIALS` unset (or empty) in your config — the gcloud configuration handles authentication.
 
 ## Manual Run
 
