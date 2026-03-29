@@ -1,0 +1,8 @@
+.env
+.envrc
+.venv/
+venv/
+
+.DS_Store
+.claude/
+

@@ -106,6 +106,8 @@ gcloud iam service-accounts keys create ~/.config/gcloud/sa-dns-updater.json \
 chmod 600 ~/.config/gcloud/sa-dns-updater.json
 ```
 
+gcloud プロバイダは `GOOGLE_APPLICATION_CREDENTIALS` で指定されたキーファイルを使って `gcloud auth activate-service-account` を自動実行します。手動での activate は不要です。
+
 ## 手動実行
 
 ```bash

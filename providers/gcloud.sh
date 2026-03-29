@@ -12,6 +12,13 @@
 
 GCLOUD="${GCLOUD:-gcloud}"
 
+# Activate service account if key file is provided.
+# gcloud CLI ignores GOOGLE_APPLICATION_CREDENTIALS; it requires explicit activation.
+if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" && -f "$GOOGLE_APPLICATION_CREDENTIALS" ]]; then
+    "$GCLOUD" auth activate-service-account \
+        --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet
+fi
+
 # dns_get_current — returns the current AAAA record value
 dns_get_current() {
     "$GCLOUD" dns record-sets list \
