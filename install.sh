@@ -68,6 +68,25 @@ if [[ -z "$CLOUDSDK_PYTHON" ]]; then
 fi
 echo "    CLOUDSDK_PYTHON: $CLOUDSDK_PYTHON"
 
+# Detect GCP project for CLOUDSDK_CORE_PROJECT (daemon mode only)
+# Prevents gcloud from inheriting the wrong active configuration when multiple
+# gcloud configs exist on the system.
+CLOUDSDK_PROJECT=""
+if [[ "$DAEMON_MODE" == true ]]; then
+    for gcloud_bin in /opt/homebrew/bin/gcloud /usr/local/bin/gcloud; do
+        if [[ -x "$gcloud_bin" ]]; then
+            CLOUDSDK_PROJECT=$("$gcloud_bin" config get-value core/project 2>/dev/null || true)
+            break
+        fi
+    done
+    if [[ -n "$CLOUDSDK_PROJECT" ]]; then
+        echo "    CLOUDSDK_CORE_PROJECT: $CLOUDSDK_PROJECT (detected from active gcloud config)"
+    else
+        echo "    WARNING: Could not detect GCP project. Edit CLOUDSDK_CORE_PROJECT in $PLIST_DST"
+        CLOUDSDK_PROJECT="YOUR_GCP_PROJECT_ID"
+    fi
+fi
+
 # Unload existing service
 if [[ "$DAEMON_MODE" == true ]]; then
     sudo launchctl unload "$PLIST_DST" 2>/dev/null || true
@@ -78,6 +97,7 @@ fi
 # Install plist (replace placeholders)
 sed -e "s|CLOUDSDK_PYTHON_PLACEHOLDER|$CLOUDSDK_PYTHON|" \
     -e "s|DDNS6_CONFIG_PLACEHOLDER|$CONFIG_DIR/ddns6.conf|" \
+    -e "s|CLOUDSDK_PROJECT_PLACEHOLDER|$CLOUDSDK_PROJECT|" \
     "$PLIST_SRC" | sudo tee "$PLIST_DST" > /dev/null
 
 if [[ "$DAEMON_MODE" == true ]]; then
@@ -90,8 +110,13 @@ echo ""
 echo "==> Next steps:"
 echo "    1. Edit $CONFIG_DIR/ddns6.conf"
 if [[ "$DAEMON_MODE" == true ]]; then
-    echo "    2. sudo launchctl load $PLIST_DST"
-    echo "    3. Check /var/log/ddns6-update.log"
+    echo "    2. Place your service account key in a root-accessible path:"
+    echo "         sudo cp sa-key.json /etc/macos-ddns6/sa-dns-updater.json"
+    echo "         sudo chmod 600 /etc/macos-ddns6/sa-dns-updater.json"
+    echo "       Then update GOOGLE_APPLICATION_CREDENTIALS in $CONFIG_DIR/ddns6.conf"
+    echo "       (macOS TCC blocks root from reading files under /Users/<user>/)"
+    echo "    3. sudo launchctl load $PLIST_DST"
+    echo "    4. Check /var/log/ddns6-update.log"
 else
     echo "    2. launchctl load $PLIST_DST"
     echo "    3. Check /tmp/ddns6-update.log"

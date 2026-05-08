@@ -59,6 +59,24 @@ sudo vi /etc/macos-ddns6/ddns6.conf
 sudo launchctl load /Library/LaunchDaemons/com.github.macos-ddns6.plist
 ```
 
+> **LaunchDaemon 使用時の必須事項**（どちらか欠けると無言で失敗します）
+>
+> 1. **サービスアカウントキーを root が読めるパスに置く**
+>    macOS TCC により、`root` は `/Users/<user>/` 配下のファイルを読めない場合があります。
+>    キーを `/etc/macos-ddns6/` にコピーしてください：
+>    ```bash
+>    sudo cp sa-dns-updater.json /etc/macos-ddns6/sa-dns-updater.json
+>    sudo chmod 600 /etc/macos-ddns6/sa-dns-updater.json
+>    ```
+>    そして `/etc/macos-ddns6/ddns6.conf` に `GOOGLE_APPLICATION_CREDENTIALS="/etc/macos-ddns6/sa-dns-updater.json"` を設定します。
+>
+> 2. **`CLOUDSDK_CORE_PROJECT` で GCP プロジェクトを固定する**
+>    `gcloud` は呼び出しシェルでアクティブな configuration のプロジェクトを使います。デーモン環境では意図しないプロジェクトになることがあります。
+>    `install.sh --daemon` は現在のプロジェクトを自動検出して plist に注入します。正しいか確認してください：
+>    ```bash
+>    sudo cat /Library/LaunchDaemons/com.github.macos-ddns6.plist | grep -A1 CLOUDSDK_CORE_PROJECT
+>    ```
+
 ## 設定
 
 `ddns6.conf.example` を `~/.config/macos-ddns6/ddns6.conf` にコピー：

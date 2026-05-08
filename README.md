@@ -59,6 +59,24 @@ sudo vi /etc/macos-ddns6/ddns6.conf
 sudo launchctl load /Library/LaunchDaemons/com.github.macos-ddns6.plist
 ```
 
+> **LaunchDaemon requirements** (important — skipping either causes silent failures):
+>
+> 1. **Service account key must be in a root-readable path.**
+>    macOS TCC may block `root` from reading files under `/Users/<user>/`.
+>    Copy the key to `/etc/macos-ddns6/` instead:
+>    ```bash
+>    sudo cp sa-dns-updater.json /etc/macos-ddns6/sa-dns-updater.json
+>    sudo chmod 600 /etc/macos-ddns6/sa-dns-updater.json
+>    ```
+>    Then set `GOOGLE_APPLICATION_CREDENTIALS="/etc/macos-ddns6/sa-dns-updater.json"` in `/etc/macos-ddns6/ddns6.conf`.
+>
+> 2. **Pin the GCP project with `CLOUDSDK_CORE_PROJECT`.**
+>    `gcloud` uses whichever configuration is active in the calling shell. In a daemon context this may be the wrong project.
+>    `install.sh --daemon` auto-detects the current project and injects it into the plist. Verify it is correct:
+>    ```bash
+>    sudo cat /Library/LaunchDaemons/com.github.macos-ddns6.plist | grep -A1 CLOUDSDK_CORE_PROJECT
+>    ```
+
 ## Configuration
 
 Copy `ddns6.conf.example` to `~/.config/macos-ddns6/ddns6.conf`:

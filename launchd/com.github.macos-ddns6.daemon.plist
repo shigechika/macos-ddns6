@@ -18,6 +18,11 @@
         <!-- Requires Python 3.10+. Adjust path for your environment. -->
         <key>CLOUDSDK_PYTHON</key>
         <string>CLOUDSDK_PYTHON_PLACEHOLDER</string>
+        <!-- GCP project for Cloud DNS. Prevents gcloud from inheriting the wrong
+             active configuration when multiple gcloud configs exist on the system.
+             Set by install.sh; edit if the detected project is incorrect. -->
+        <key>CLOUDSDK_CORE_PROJECT</key>
+        <string>CLOUDSDK_PROJECT_PLACEHOLDER</string>
     </dict>
     <key>RunAtLoad</key>
     <true/>
