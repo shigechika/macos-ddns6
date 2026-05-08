@@ -76,6 +76,8 @@ if [[ "$DAEMON_MODE" == true ]]; then
     for gcloud_bin in /opt/homebrew/bin/gcloud /usr/local/bin/gcloud; do
         if [[ -x "$gcloud_bin" ]]; then
             CLOUDSDK_PROJECT=$("$gcloud_bin" config get-value core/project 2>/dev/null || true)
+            # gcloud prints "(unset)" (not empty) when no project is configured
+            [[ "$CLOUDSDK_PROJECT" == "(unset)" ]] && CLOUDSDK_PROJECT=""
             break
         fi
     done
@@ -95,10 +97,16 @@ else
 fi
 
 # Install plist (replace placeholders)
-sed -e "s|CLOUDSDK_PYTHON_PLACEHOLDER|$CLOUDSDK_PYTHON|" \
-    -e "s|DDNS6_CONFIG_PLACEHOLDER|$CONFIG_DIR/ddns6.conf|" \
-    -e "s|CLOUDSDK_PROJECT_PLACEHOLDER|$CLOUDSDK_PROJECT|" \
-    "$PLIST_SRC" | sudo tee "$PLIST_DST" > /dev/null
+if [[ "$DAEMON_MODE" == true ]]; then
+    sed -e "s|CLOUDSDK_PYTHON_PLACEHOLDER|$CLOUDSDK_PYTHON|" \
+        -e "s|DDNS6_CONFIG_PLACEHOLDER|$CONFIG_DIR/ddns6.conf|" \
+        -e "s|CLOUDSDK_PROJECT_PLACEHOLDER|$CLOUDSDK_PROJECT|" \
+        "$PLIST_SRC" | sudo tee "$PLIST_DST" > /dev/null
+else
+    sed -e "s|CLOUDSDK_PYTHON_PLACEHOLDER|$CLOUDSDK_PYTHON|" \
+        -e "s|DDNS6_CONFIG_PLACEHOLDER|$CONFIG_DIR/ddns6.conf|" \
+        "$PLIST_SRC" | sudo tee "$PLIST_DST" > /dev/null
+fi
 
 if [[ "$DAEMON_MODE" == true ]]; then
     sudo chown root:wheel "$PLIST_DST"
