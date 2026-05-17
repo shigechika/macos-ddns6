@@ -2,7 +2,7 @@
 
 [English](README.md) | 日本語
 
-macOS 向けダイナミック DNS 更新ツール — IPv6 SLAAC アドレスおよび/またはパブリック IPv4 アドレスを自動検出して DNS レコードを更新します。
+macOS 向けダイナミック DNS 更新ツール — IPv6 SLAAC・パブリック IPv4 アドレスを自動検出して DNS レコードを更新します。
 
 ## 特徴
 

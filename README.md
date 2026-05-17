@@ -2,7 +2,7 @@
 
 English | [日本語](README.ja.md)
 
-Dynamic DNS updater for macOS — automatically detects your IPv6 SLAAC address and/or public IPv4 address and updates DNS records.
+Dynamic DNS updater for macOS — automatically detects IPv6 SLAAC and/or public IPv4 addresses and updates DNS records.
 
 ## Features
 

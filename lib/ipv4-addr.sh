@@ -11,7 +11,6 @@ get_ipv4_addr() {
     addr=$(curl -4 -s --connect-timeout 10 https://checkip.amazonaws.com 2>/dev/null | tr -d '[:space:]')
     if [[ "$addr" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         echo "$addr"
-        return 0
     fi
-    return 1
+    # always returns 0 (empty output on failure), mirroring get_ipv6_addr
 }
