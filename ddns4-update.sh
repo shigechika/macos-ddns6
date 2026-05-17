@@ -1,7 +1,7 @@
 #!/bin/bash
 # ddns4-update.sh — Dynamic DNS updater for macOS (IPv4 / A record)
 #
-# Detects the public IPv4 address and updates the A record
+# Detects the global IPv4 address and updates the A record
 # via the configured DNS provider.
 #
 # Usage:
@@ -60,7 +60,7 @@ source "$SCRIPT_DIR/lib/ipv4-addr.sh"
 ADDR=$(get_ipv4_addr)
 
 if [[ -z "$ADDR" ]]; then
-    log "ERROR: could not detect public IPv4 address"
+    log "ERROR: could not detect global IPv4 address"
     exit 1
 fi
 

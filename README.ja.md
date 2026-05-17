@@ -2,12 +2,12 @@
 
 [English](README.md) | 日本語
 
-macOS 向けダイナミック DNS 更新ツール — IPv6 SLAAC・パブリック IPv4 アドレスを自動検出して DNS レコードを更新します。
+macOS 向けダイナミック DNS 更新ツール — IPv6 SLAAC・グローバル IPv4 アドレスを自動検出して DNS レコードを更新します。
 
 ## 特徴
 
 - **IPv6 SLAAC 検出** — 全インターフェースから `autoconf secured`（RFC 7217）アドレスを検出
-- **IPv4 検出** — 外部サービスに問い合わせてパブリック WAN アドレスを取得（NAT/ルーター DNAT 環境に対応）
+- **IPv4 検出** — 外部サービスに問い合わせてグローバル WAN アドレスを取得（NAT/ルーター DNAT 環境に対応）
 - **イベント駆動更新** — macOS `launchd` の WatchPaths でネットワーク変化を検知
 - **ポーリングフォールバック** — イベント漏れに備えて 5 分ごとにチェック
 - **ローカルキャッシュ** — アドレス変化がなければ DNS API 呼び出しをスキップ
@@ -29,7 +29,7 @@ macOS は SLAAC で 3 種類の IPv6 アドレスを割り当てます：
 
 ### IPv4（A レコード）— `ddns4-update.sh`
 
-ホームルーターや NAT 環境下の macOS では、`ifconfig` でパブリック WAN IPv4 アドレスを取得できません。`ddns4-update.sh` は `https://checkip.amazonaws.com` に問い合わせてパブリックアドレスを取得し、A レコードを更新します。ルーターでポートフォワーディング（DNAT）を設定している場合に、ルーターの動的 WAN IP を A レコードで追跡するのに便利です。
+ホームルーターや NAT 環境下の macOS では、`ifconfig` でグローバル WAN IPv4 アドレスを取得できません。`ddns4-update.sh` は `https://checkip.amazonaws.com` に問い合わせてグローバルアドレスを取得し、A レコードを更新します。ルーターでポートフォワーディング（DNAT）を設定している場合に、ルーターの動的 WAN IP を A レコードで追跡するのに便利です。
 
 ## クイックスタート
 

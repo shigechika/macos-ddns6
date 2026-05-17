@@ -2,12 +2,12 @@
 
 English | [日本語](README.ja.md)
 
-Dynamic DNS updater for macOS — automatically detects IPv6 SLAAC and/or public IPv4 addresses and updates DNS records.
+Dynamic DNS updater for macOS — automatically detects IPv6 SLAAC and/or global IPv4 addresses and updates DNS records.
 
 ## Features
 
 - **IPv6 SLAAC detection** — finds `autoconf secured` (RFC 7217) addresses across all interfaces
-- **IPv4 detection** — queries an external service to discover the public WAN address (useful behind NAT/router DNAT)
+- **IPv4 detection** — queries an external service to discover the global WAN address (useful behind NAT/router DNAT)
 - **Event-driven updates** — uses macOS `launchd` WatchPaths to trigger on network changes
 - **Polling fallback** — checks every 5 minutes in case events are missed
 - **Local cache** — skips DNS API calls when the address hasn't changed
@@ -29,7 +29,7 @@ The `autoconf secured` address (RFC 7217) is deterministically generated from th
 
 ### IPv4 (A record) — `ddns4-update.sh`
 
-macOS behind a home router or NAT device does not expose the public WAN IPv4 address via `ifconfig`. `ddns4-update.sh` queries `https://checkip.amazonaws.com` to obtain the public address, then updates the A record. This is useful when port-forwarding (DNAT) is configured on the router and you need the A record to track the router's dynamic WAN IP.
+macOS behind a home router or NAT device does not expose the global IPv4 address via `ifconfig`. `ddns4-update.sh` queries `https://checkip.amazonaws.com` to obtain the global address, then updates the A record. This is useful when port-forwarding (DNAT) is configured on the router and you need the A record to track the router's dynamic WAN IP.
 
 ## Quick Start
 
