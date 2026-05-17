@@ -1,0 +1,40 @@
+# ddns4.conf — macos-ddns6 configuration (IPv4 / A record)
+#
+# Copy this file to one of the following locations:
+#   ~/.config/macos-ddns6/ddns4.conf  (user)
+#   /etc/macos-ddns6/ddns4.conf       (system)
+#
+# Or specify a custom path:
+#   ddns4-update.sh --config /path/to/ddns4.conf
+
+# DNS provider: gcloud (default)
+# Future: cloudflare, route53
+DNS_PROVIDER="gcloud"
+
+# Record type: A (IPv4)
+DNS_TYPE="A"
+
+# Fully qualified domain name (must end with a dot for Cloud DNS)
+DNS_FQDN="myhost.example.com."
+
+# Record TTL in seconds
+DNS_TTL=300
+
+# --- Google Cloud DNS provider settings ---
+
+# Cloud DNS managed zone name
+DNS_ZONE="example-com"
+
+# Path to service account key JSON.
+# LaunchAgent (default): $HOME expands to the user's home directory.
+# LaunchDaemon (--daemon): the process runs as root. $HOME becomes /var/root,
+#   and macOS TCC may block root from reading files under /Users/<user>/.
+#   Copy the key to a root-accessible path instead:
+#     sudo cp sa-key.json /etc/macos-ddns6/sa-dns-updater.json
+#     sudo chmod 600 /etc/macos-ddns6/sa-dns-updater.json
+GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/sa-dns-updater.json"
+# LaunchDaemon example:
+# GOOGLE_APPLICATION_CREDENTIALS="/etc/macos-ddns6/sa-dns-updater.json"
+
+# Path to gcloud binary (auto-detected if not set)
+# GCLOUD="/opt/homebrew/bin/gcloud"

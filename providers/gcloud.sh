@@ -19,14 +19,14 @@ if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" && -f "$GOOGLE_APPLICATION_CREDEN
         --key-file="$GOOGLE_APPLICATION_CREDENTIALS" --quiet
 fi
 
-# dns_get_current — returns the current AAAA record value
+# dns_get_current — returns the current DNS record value (A or AAAA)
 dns_get_current() {
     "$GCLOUD" dns record-sets list \
-        --zone="$DNS_ZONE" --name="$DNS_FQDN" --type=AAAA \
+        --zone="$DNS_ZONE" --name="$DNS_FQDN" --type="${DNS_TYPE:-AAAA}" \
         --format='value(rrdatas[0])' 2>/dev/null || echo ""
 }
 
-# dns_update — updates the AAAA record from $1 (old) to $2 (new)
+# dns_update — updates the DNS record from $1 (old) to $2 (new)
 dns_update() {
     local old="$1" new="$2"
     local tmpdir
@@ -38,12 +38,12 @@ dns_update() {
 
     if [[ -n "$old" ]]; then
         "$GCLOUD" dns record-sets transaction remove "$old" \
-            --zone="$DNS_ZONE" --name="$DNS_FQDN" --type=AAAA --ttl="$DNS_TTL" \
+            --zone="$DNS_ZONE" --name="$DNS_FQDN" --type="${DNS_TYPE:-AAAA}" --ttl="$DNS_TTL" \
             --transaction-file="$tmpdir/tr.yaml"
     fi
 
     "$GCLOUD" dns record-sets transaction add "$new" \
-        --zone="$DNS_ZONE" --name="$DNS_FQDN" --type=AAAA --ttl="$DNS_TTL" \
+        --zone="$DNS_ZONE" --name="$DNS_FQDN" --type="${DNS_TYPE:-AAAA}" --ttl="$DNS_TTL" \
         --transaction-file="$tmpdir/tr.yaml"
 
     "$GCLOUD" dns record-sets transaction execute --zone="$DNS_ZONE" \
