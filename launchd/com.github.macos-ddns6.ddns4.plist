@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.github.macos-ddns6.ddns4</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/ddns4-update.sh</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <!-- Bypass gcloud virtenv activation error in launchd.
+             Requires Python 3.10+. Adjust path for your environment:
+             - Homebrew (Apple Silicon): /opt/homebrew/bin/python3
+             - Homebrew (Intel):         /usr/local/bin/python3
+             - macOS built-in:           /usr/bin/python3 (3.9, may not work) -->
+        <key>CLOUDSDK_PYTHON</key>
+        <string>CLOUDSDK_PYTHON_PLACEHOLDER</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <!-- Event-driven: trigger on network configuration changes -->
+    <key>WatchPaths</key>
+    <array>
+        <string>/var/run/resolv.conf</string>
+        <string>/Library/Preferences/SystemConfiguration/com.apple.airport.preferences.plist</string>
+    </array>
+    <!-- Polling fallback: every 5 minutes -->
+    <key>StartInterval</key>
+    <integer>300</integer>
+    <key>StandardOutPath</key>
+    <string>/tmp/ddns4-update.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/ddns4-update.log</string>
+</dict>
+</plist>

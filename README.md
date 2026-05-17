@@ -2,11 +2,12 @@
 
 English | [日本語](README.ja.md)
 
-Dynamic DNS updater for macOS — automatically detects your IPv6 SLAAC address and updates DNS records.
+Dynamic DNS updater for macOS — automatically detects IPv6 SLAAC and/or global IPv4 addresses and updates DNS records.
 
 ## Features
 
 - **IPv6 SLAAC detection** — finds `autoconf secured` (RFC 7217) addresses across all interfaces
+- **IPv4 detection** — queries an external service to discover the global WAN address (useful behind NAT/router DNAT)
 - **Event-driven updates** — uses macOS `launchd` WatchPaths to trigger on network changes
 - **Polling fallback** — checks every 5 minutes in case events are missed
 - **Local cache** — skips DNS API calls when the address hasn't changed
@@ -14,15 +15,21 @@ Dynamic DNS updater for macOS — automatically detects your IPv6 SLAAC address 
 
 ## How it works
 
+### IPv6 (AAAA record) — `ddns6-update.sh`
+
 macOS assigns three types of IPv6 addresses via SLAAC:
 
-| Type | Flag | Stability | Used by macos-ddns6 |
+| Type | Flag | Stability | Used by ddns6 |
 |------|------|-----------|:---:|
 | Link-local | `secured` | Stable | No (not routable) |
 | Global stable | `autoconf secured` | Stable while network environment unchanged | **Yes** |
 | Global temporary | `autoconf temporary` | Rotates periodically | No |
 
 The `autoconf secured` address (RFC 7217) is deterministically generated from the network prefix and a per-host secret. It remains stable as long as you stay on the same network, making it ideal for DNS registration.
+
+### IPv4 (A record) — `ddns4-update.sh`
+
+macOS behind a home router or NAT device does not expose the global IPv4 address via `ifconfig`. `ddns4-update.sh` queries `https://checkip.amazonaws.com` to obtain the global address, then updates the A record. This is useful when port-forwarding (DNAT) is configured on the router and you need the A record to track the router's dynamic WAN IP.
 
 ## Quick Start
 
@@ -32,16 +39,18 @@ cd macos-ddns6
 ./install.sh
 ```
 
-Edit the config file:
+Edit the config file(s):
 
 ```bash
-vi ~/.config/macos-ddns6/ddns6.conf
+vi ~/.config/macos-ddns6/ddns6.conf   # AAAA record (IPv6)
+vi ~/.config/macos-ddns6/ddns4.conf   # A record (IPv4) — skip if not needed
 ```
 
-Start the service:
+Start the service(s):
 
 ```bash
-launchctl load ~/Library/LaunchAgents/com.github.macos-ddns6.plist
+launchctl load ~/Library/LaunchAgents/com.github.macos-ddns6.plist        # IPv6
+launchctl load ~/Library/LaunchAgents/com.github.macos-ddns6.ddns4.plist  # IPv4 (optional)
 ```
 
 ### LaunchAgent vs LaunchDaemon
@@ -56,7 +65,9 @@ Use `--daemon` for headless servers or Mac minis that may reboot without user lo
 ```bash
 sudo ./install.sh --daemon
 sudo vi /etc/macos-ddns6/ddns6.conf
+sudo vi /etc/macos-ddns6/ddns4.conf  # if using IPv4 DDNS
 sudo launchctl load /Library/LaunchDaemons/com.github.macos-ddns6.plist
+sudo launchctl load /Library/LaunchDaemons/com.github.macos-ddns6.ddns4.plist  # if using IPv4 DDNS
 ```
 
 > **LaunchDaemon requirements** (important — skipping either causes silent failures):
@@ -68,7 +79,7 @@ sudo launchctl load /Library/LaunchDaemons/com.github.macos-ddns6.plist
 >    sudo cp sa-dns-updater.json /etc/macos-ddns6/sa-dns-updater.json
 >    sudo chmod 600 /etc/macos-ddns6/sa-dns-updater.json
 >    ```
->    Then set `GOOGLE_APPLICATION_CREDENTIALS="/etc/macos-ddns6/sa-dns-updater.json"` in `/etc/macos-ddns6/ddns6.conf`.
+>    Then set `GOOGLE_APPLICATION_CREDENTIALS="/etc/macos-ddns6/sa-dns-updater.json"` in both conf files.
 >
 > 2. **Pin the GCP project with `CLOUDSDK_CORE_PROJECT`.**
 >    `gcloud` uses whichever configuration is active in the calling shell. In a daemon context this may be the wrong project.
@@ -78,6 +89,8 @@ sudo launchctl load /Library/LaunchDaemons/com.github.macos-ddns6.plist
 >    ```
 
 ## Configuration
+
+### IPv6 — `ddns6.conf`
 
 Copy `ddns6.conf.example` to `~/.config/macos-ddns6/ddns6.conf`:
 
@@ -97,6 +110,21 @@ DNS_ZONE="example-com"
 # Service account key
 GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/sa-dns-updater.json"
 ```
+
+### IPv4 — `ddns4.conf`
+
+Copy `ddns4.conf.example` to `~/.config/macos-ddns6/ddns4.conf`:
+
+```bash
+DNS_PROVIDER="gcloud"
+DNS_TYPE="A"
+DNS_FQDN="myhost.example.com."
+DNS_TTL=300
+DNS_ZONE="example-com"
+GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/sa-dns-updater.json"
+```
+
+The only difference from `ddns6.conf` is `DNS_TYPE="A"`. Both configs can share the same service account key.
 
 ### Google Cloud DNS Setup
 
@@ -131,7 +159,7 @@ The gcloud provider supports two authentication methods:
 **Method A: Key file (default)** — Set `GOOGLE_APPLICATION_CREDENTIALS` in your config. The provider automatically runs `gcloud auth activate-service-account` on each invocation.
 
 ```bash
-# In ddns6.conf
+# In ddns6.conf / ddns4.conf
 GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/sa-dns-updater.json"
 ```
 
@@ -153,31 +181,40 @@ When using Method B, leave `GOOGLE_APPLICATION_CREDENTIALS` unset (or empty) in 
 ## Manual Run
 
 ```bash
+# IPv6
 ddns6-update.sh
-# or with a custom config:
 ddns6-update.sh --config /path/to/ddns6.conf
+
+# IPv4
+ddns4-update.sh
+ddns4-update.sh --config /path/to/ddns4.conf
 ```
 
 Check the log:
 
 ```bash
 tail -f /tmp/ddns6-update.log
+tail -f /tmp/ddns4-update.log
 ```
 
 ## Project Structure
 
 ```
 macos-ddns6/
-├── ddns6-update.sh         # Main update script
-├── ddns6.conf.example      # Configuration template
+├── ddns6-update.sh         # IPv6 (AAAA) update script
+├── ddns4-update.sh         # IPv4 (A) update script
+├── ddns6.conf.example      # Configuration template (AAAA)
+├── ddns4.conf.example      # Configuration template (A)
 ├── install.sh              # Installer (--daemon for LaunchDaemon)
 ├── lib/
-│   └── ipv6-addr.sh        # IPv6 address detection library
+│   ├── ipv6-addr.sh        # IPv6 address detection library
+│   └── ipv4-addr.sh        # IPv4 address detection library
 ├── providers/
-│   └── gcloud.sh           # Google Cloud DNS provider
+│   └── gcloud.sh           # Google Cloud DNS provider (A and AAAA)
 ├── launchd/
-│   ├── com.github.macos-ddns6.plist         # LaunchAgent template
-│   └── com.github.macos-ddns6.daemon.plist  # LaunchDaemon template
+│   ├── com.github.macos-ddns6.plist         # LaunchAgent template (IPv6)
+│   ├── com.github.macos-ddns6.ddns4.plist   # LaunchAgent template (IPv4)
+│   └── com.github.macos-ddns6.daemon.plist  # LaunchDaemon template (IPv6)
 └── README.md
 ```
 
@@ -186,19 +223,20 @@ macos-ddns6/
 Create a new file in `providers/` (e.g., `providers/cloudflare.sh`) implementing two functions:
 
 ```bash
-# dns_get_current — returns the current AAAA record value
+# dns_get_current — returns the current record value (A or AAAA, per DNS_TYPE)
 dns_get_current() { ... }
 
-# dns_update — updates the AAAA record from $1 (old) to $2 (new)
+# dns_update — updates the record from $1 (old) to $2 (new)
 dns_update() { ... }
 ```
 
-Then set `DNS_PROVIDER="cloudflare"` in your config.
+The record type is available as `$DNS_TYPE` (default: `AAAA`). Then set `DNS_PROVIDER="cloudflare"` in your config.
 
 ## Requirements
 
-- macOS (uses `ifconfig` and `launchd`)
+- macOS (uses `ifconfig` for IPv6 detection and `launchd`)
 - Bash
+- `curl` (for IPv4 detection via `checkip.amazonaws.com`)
 - `gcloud` CLI (for Google Cloud DNS provider)
 
 ## License
