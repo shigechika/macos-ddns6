@@ -239,6 +239,23 @@ The record type is available as `$DNS_TYPE` (default: `AAAA`). Then set `DNS_PRO
 - `curl` (for IPv4 detection via `checkip.amazonaws.com`)
 - `gcloud` CLI (for Google Cloud DNS provider)
 
+## Releasing
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please).
+Merging [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, …)
+to `main` keeps a release PR open with the next version and changelog. Merging
+that PR tags `vX.Y.Z` and publishes a GitHub Release.
+
+> [!IMPORTANT]
+> The release-please workflow should be given a repository secret
+> `RELEASE_PLEASE_TOKEN` (a PAT with `contents: write` + `pull-requests: write`).
+> A personal repository's default settings can block GitHub Actions'
+> built-in `GITHUB_TOKEN` from creating pull requests at all, which would
+> silently stop release-please from ever opening its release PR — the PAT
+> works around that. The workflow falls back to `GITHUB_TOKEN` when the
+> secret is unset, so PR CI still passes on forks (release automation just
+> won't run there).
+
 ## License
 
 MIT

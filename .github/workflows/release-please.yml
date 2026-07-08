@@ -1,0 +1,27 @@
+name: release-please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          # Use a fine-grained PAT so the tag/Release release-please creates
+          # can trigger downstream workflows and so PR creation isn't blocked
+          # on a personal repo (GITHUB_TOKEN-authored PRs/Releases don't
+          # trigger downstream workflow runs, and some personal-repo default
+          # settings block Actions from creating PRs at all). Falls back to
+          # GITHUB_TOKEN when the secret is unset so PR CI keeps working on
+          # forks.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
