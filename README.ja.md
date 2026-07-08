@@ -239,6 +239,22 @@ dns_update() { ... }
 - `curl`（`checkip.amazonaws.com` 経由の IPv4 検出に使用）
 - `gcloud` CLI（Google Cloud DNS プロバイダの場合）
 
+## リリース
+
+リリースは [release-please](https://github.com/googleapis/release-please) で
+自動化されている。[Conventional Commits](https://www.conventionalcommits.org/)
+（`feat:`、`fix:` 等）を `main` にマージすると、次バージョンと changelog を
+持つリリース PR が維持される。その PR をマージすると `vX.Y.Z` がタグ付けされ
+GitHub Release が公開される。
+
+> [!IMPORTANT]
+> release-please の workflow にはリポジトリシークレット `RELEASE_PLEASE_TOKEN`
+> （`contents: write` + `pull-requests: write` を持つ PAT）を設定すること。
+> 既定の `GITHUB_TOKEN` は下流の workflow を起動する Release を作成できない
+> （GitHub が `GITHUB_TOKEN` 起因の workflow 起動をブロックするため）ので、
+> PAT がないと何も公開されない。シークレット未設定時は `GITHUB_TOKEN` に
+> フォールバックするので、fork 上でも PR CI は動作する。
+
 ## ライセンス
 
 MIT
