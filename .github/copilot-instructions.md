@@ -2,9 +2,9 @@
 
 `macos-ddns6` is a Dynamic DNS updater for macOS. Two near-identical
 entry-point scripts, `ddns6-update.sh` (IPv6 AAAA, via SLAAC "autoconf
-secured" address detection) and `ddns4-update.sh` (IPv4 A record), each:
-load a config file, detect the current address, compare against a local
-cache to skip a no-op run, then delegate the actual record read/write to a
+secured" address detection) and `ddns4-update.sh` (IPv4 A record), each
+loads a config file, detects the current address, compares against a local
+cache to skip a no-op run, then delegates the actual record read/write to a
 pluggable DNS provider script (`providers/<name>.sh`, currently only
 `gcloud.sh` for Google Cloud DNS). `install.sh` sets up a launchd
 LaunchAgent (per-login) or LaunchDaemon (at-boot) to run these on a

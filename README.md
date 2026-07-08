@@ -249,11 +249,12 @@ that PR tags `vX.Y.Z` and publishes a GitHub Release.
 > [!IMPORTANT]
 > The release-please workflow should be given a repository secret
 > `RELEASE_PLEASE_TOKEN` (a PAT with `contents: write` + `pull-requests: write`).
-> The default `GITHUB_TOKEN` cannot create the Release that triggers
-> downstream workflows (GitHub blocks workflow runs triggered by
-> `GITHUB_TOKEN`), so without the PAT nothing gets published. The workflow
-> falls back to `GITHUB_TOKEN` when the secret is unset so PR CI keeps
-> working on forks.
+> A personal repository's default settings can block GitHub Actions'
+> built-in `GITHUB_TOKEN` from creating pull requests at all, which would
+> silently stop release-please from ever opening its release PR — the PAT
+> works around that. The workflow falls back to `GITHUB_TOKEN` when the
+> secret is unset, so PR CI still passes on forks (release automation just
+> won't run there).
 
 ## License
 

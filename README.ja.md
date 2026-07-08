@@ -250,10 +250,11 @@ GitHub Release が公開される。
 > [!IMPORTANT]
 > release-please の workflow にはリポジトリシークレット `RELEASE_PLEASE_TOKEN`
 > （`contents: write` + `pull-requests: write` を持つ PAT）を設定すること。
-> 既定の `GITHUB_TOKEN` は下流の workflow を起動する Release を作成できない
-> （GitHub が `GITHUB_TOKEN` 起因の workflow 起動をブロックするため）ので、
-> PAT がないと何も公開されない。シークレット未設定時は `GITHUB_TOKEN` に
-> フォールバックするので、fork 上でも PR CI は動作する。
+> 個人リポジトリの既定設定では、GitHub Actions 組み込みの `GITHUB_TOKEN` が
+> PR 作成自体をブロックされる場合があり、その場合 release-please のリリース
+> PR が静かに一度も作られなくなる — PAT はこれを回避する。シークレット未設定
+> 時は `GITHUB_TOKEN` にフォールバックするので fork 上でも PR CI は動作する
+> （その場合 fork ではリリース自動化自体は動かない）。
 
 ## ライセンス
 
