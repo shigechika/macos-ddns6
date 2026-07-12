@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/shigechika/macos-ddns6/compare/v1.0.0...v1.0.1) (2026-07-12)
+
+
+### Bug Fixes
+
+* correct ddns4 daemon log path in install.sh completion message ([#12](https://github.com/shigechika/macos-ddns6/issues/12)) ([fed2f19](https://github.com/shigechika/macos-ddns6/commit/fed2f1920e1a609b3ec124003546a1156e30cb7b)), closes [#10](https://github.com/shigechika/macos-ddns6/issues/10)
+
 ## 1.0.0 (2026-07-08)
 
 
