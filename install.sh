@@ -142,7 +142,7 @@ if [[ "$DAEMON_MODE" == true ]]; then
     echo "       (macOS TCC blocks root from reading files under /Users/<user>/)"
     echo "    3. sudo launchctl load $PLIST6_DST"
     echo "       sudo launchctl load $PLIST4_DST  # if using IPv4 DDNS"
-    echo "    4. Check /var/log/ddns6-update.log and /var/log/ddns4-update.log"
+    echo "    4. Check /var/log/ddns6-update.log and /tmp/ddns4-update.log"
 else
     echo "    2. launchctl load $PLIST6_DST"
     echo "       launchctl load $PLIST4_DST  # if using IPv4 DDNS"
